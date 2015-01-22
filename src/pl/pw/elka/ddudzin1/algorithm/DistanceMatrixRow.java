@@ -1,5 +1,7 @@
 package pl.pw.elka.ddudzin1.algorithm;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -44,12 +46,17 @@ public class DistanceMatrixRow {
 	public DistanceMatrixRow join(Pair newcluster,
 			DistanceMatrixRow distanceMatrixRow) {
 
-		if (joinType.equals("single")) {
-			Set<String> keys = distances.keySet();
-			for (String key : keys) {
+		Set<String> keys = distances.keySet();
+		for (String key : keys) {
+			if (joinType.equals("single")) {
 				distances.put(
 						key,
 						Math.min(distances.get(key),
+								distanceMatrixRow.getDistace(key)));
+			} else if (joinType.equals("complete")) {
+				distances.put(
+						key,
+						Math.max(distances.get(key),
 								distanceMatrixRow.getDistace(key)));
 			}
 		}
@@ -64,12 +71,60 @@ public class DistanceMatrixRow {
 	public void recalculateRow(Pair newcluster, DistanceMatrixRow newclusterRow) {
 		String left = newcluster.getLeft();
 		String right = newcluster.getRight();
-		distances.remove(left);
-		distances.remove(right);
+		if (newclusterRow.getDistace(this.getClusterName()) != null) {
+			distances.remove(left);
+			distances.remove(right);
 
-		distances.put(newclusterRow.getClusterName(),
-				newclusterRow.getDistace(this.clusterName));
-
+			distances.put(newclusterRow.getClusterName(),
+					newclusterRow.getDistace(this.clusterName));
+		} else {
+			if (joinType.equals("single")) {
+				distances.put(newclusterRow.getClusterName(),
+						Math.min(distances.get(left), distances.get(right)));
+				distances.remove(left);
+				distances.remove(right);
+			} else if (joinType.equals("complete")) {
+				distances.put(newclusterRow.getClusterName(),
+						Math.max(distances.get(left), distances.get(right)));
+				distances.remove(left);
+				distances.remove(right);
+			}
+		}
 	}
 
+	public String toString() {
+		String s = "";
+		Set<String> keys = distances.keySet();
+
+		for (String string : keys) {
+			s += "{" + string + "}" + " = " + distances.get(string) + ";'";
+		}
+
+		return s.substring(0, s.length() - 1);
+	}
+
+	public ArrayList<String> getCandidates() {
+		ArrayList<String> candList = new ArrayList<String>();
+		Collection<Double> values = distances.values();
+
+		Double min = -1D, st = -1D;
+		for (Double val : values) {
+			if (min.equals(st) && !val.equals(0D)) {
+				min = val;
+			} else {
+				if (min > val && !val.equals(0D)) {
+					min = val;
+				}
+			}
+		}
+
+		Set<String> keys = distances.keySet();
+		for (String key : keys) {
+			if (distances.get(key) == min) {
+				candList.add(key);
+			}
+		}
+
+		return candList;
+	}
 }

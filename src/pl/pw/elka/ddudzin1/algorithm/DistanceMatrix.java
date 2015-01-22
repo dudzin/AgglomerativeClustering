@@ -1,5 +1,6 @@
 package pl.pw.elka.ddudzin1.algorithm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -22,6 +23,10 @@ public class DistanceMatrix {
 		return distanceMatrix.get(clusterName);
 	}
 
+	public Set<String> getClusterNames() {
+		return distanceMatrix.keySet();
+	}
+
 	public void join(Pair newcluster) {
 		DistanceMatrixRow newdmr = distanceMatrix.get(newcluster.getLeft())
 				.join(newcluster, distanceMatrix.get(newcluster.getRight()));
@@ -38,6 +43,13 @@ public class DistanceMatrix {
 			if (!newcluster.getNewName().equals(clname))
 				distanceMatrix.get(clname).recalculateRow(newcluster,
 						distanceMatrix.get(newcluster.getNewName()));
+		}
+
+	}
+
+	public void recalculateMatrix(ArrayList<Pair> newclusters) {
+		for (Pair newcluster : newclusters) {
+			recalculateMatrix(newcluster);
 		}
 
 	}
