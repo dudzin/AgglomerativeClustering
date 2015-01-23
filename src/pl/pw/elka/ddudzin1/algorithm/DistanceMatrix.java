@@ -9,6 +9,7 @@ import pl.pw.elka.ddudzin1.algorithm.test.Pair;
 public class DistanceMatrix {
 
 	private HashMap<String, DistanceMatrixRow> distanceMatrix;
+	private DistanceMatrixRow newdmr;
 
 	public DistanceMatrix() {
 		distanceMatrix = new HashMap<String, DistanceMatrixRow>();
@@ -28,8 +29,8 @@ public class DistanceMatrix {
 	}
 
 	public void join(Pair newcluster) {
-		DistanceMatrixRow newdmr = distanceMatrix.get(newcluster.getLeft())
-				.join(newcluster, distanceMatrix.get(newcluster.getRight()));
+		newdmr = distanceMatrix.get(newcluster.getLeft()).join(newcluster,
+				distanceMatrix.get(newcluster.getRight()));
 		distanceMatrix.remove(newcluster.getLeft());
 		distanceMatrix.remove(newcluster.getRight());
 

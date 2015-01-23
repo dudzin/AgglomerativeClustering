@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import pl.pw.elka.ddudzin1.algorithm.Cluster;
 import pl.pw.elka.ddudzin1.algorithm.DistanceMatrix;
 import pl.pw.elka.ddudzin1.algorithm.HierarchicalClusterAlgoritm;
 import pl.pw.elka.ddudzin1.algorithm.MatrixReader;
@@ -81,7 +82,7 @@ public class HierarchicalClusterAlgoritmTest {
 				runType);
 		MatrixReader mxr = new MatrixReader();
 		String joinType = "single";
-		DistanceMatrix dm = mxr.read("testdata/50elems", joinType);
+		DistanceMatrix dm = mxr.read("testdata/10elems", joinType);
 
 		alg.setMatrix(dm);
 		alg.run();
@@ -92,8 +93,8 @@ public class HierarchicalClusterAlgoritmTest {
 		assertEquals(1, alg.getMatrix().getClusterNames().size());
 		assertEquals(8, alg.getIterationCnt());
 
-		// Cluster root = alg.getRoot();
-		// root.print("");
+		Cluster root = alg.getRoot();
+		root.print("");
 
 	}
 

@@ -27,7 +27,8 @@ public class HierarchicalClusterAlgoritm {
 
 		// split to threads and then join into rawcandidates.putAll
 		for (String clname : clusterNames) {
-			rawcandidates.put(clname, dm.getRow(clname).getCandidates());
+			rawcandidates.put(clname,
+					dm.getRow(clname).getCandidates(candidates));
 		}
 	}
 
@@ -83,7 +84,9 @@ public class HierarchicalClusterAlgoritm {
 	}
 
 	public void join() {
-
+		long time1, time2;
+		time1 = System.nanoTime();
+		// System.out.println("join " + (intertime1 - intertime2) / 1000);
 		for (Pair pair : candidates) {
 			dm.join(pair);
 			Cluster newclust = new Cluster(pair.getNewName(), clusters.get(pair
@@ -94,8 +97,11 @@ public class HierarchicalClusterAlgoritm {
 			clusters.put(pair.getNewName(), newclust);
 
 		}
-
-		dm.recalculateMatrix(candidates);
+		// time2 = System.nanoTime();
+		// System.out.println("for " + (time2 - time1) / 1000);
+		// dm.recalculateMatrix(candidates);
+		// time1 = System.nanoTime();
+		// System.out.println("recalc " + (time1 - time2) / 1000);
 
 	}
 
@@ -108,21 +114,21 @@ public class HierarchicalClusterAlgoritm {
 		startTime = System.nanoTime();
 		long intertime1, intertime2 = startTime;
 		while (clusters.size() != 1) {
-
+			// intertime2 = System.nanoTime();
 			findCandidates();
 
-			intertime2 = System.nanoTime();
+			// intertime1 = System.nanoTime();
+			// System.out.println("find " + (intertime1 - intertime2) / 1000);
+			// intertime2 = System.nanoTime();
 			verifyCandidates();
 
-			intertime1 = System.nanoTime();
-			System.out.println("verify " + (intertime1 - intertime2) / 1000
-					/ 1000);
-			intertime2 = System.nanoTime();
+			// intertime1 = System.nanoTime();
+			// System.out.println("verify " + (intertime1 - intertime2) / 1000);
+			// intertime2 = System.nanoTime();
 			join();
 
-			intertime1 = System.nanoTime();
-			System.out.println("join " + (intertime1 - intertime2) / 1000
-					/ 1000);
+			// intertime1 = System.nanoTime();
+			// System.out.println("join " + (intertime1 - intertime2) / 1000);
 			iterationCnt++;
 		}
 		endTime = System.nanoTime();

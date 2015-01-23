@@ -128,6 +128,62 @@ public class DistanceMatrixRow {
 		return candList;
 	}
 
+	public ArrayList<String> getCandidates(ArrayList<Pair> oldcandidates) {
+		ArrayList<String> candList = new ArrayList<String>();
+		Collection<Double> values = distances.values();
+		if (oldcandidates != null) {
+			joinOldCandidates(oldcandidates);
+		}
+
+		Double min = -1D, st = -1D;
+		for (Double val : values) {
+			if (min.equals(st) && !val.equals(0D)) {
+				min = val;
+			} else {
+				if (min > val && !val.equals(0D)) {
+					min = val;
+				}
+			}
+		}
+
+		Set<String> keys = distances.keySet();
+		for (String key : keys) {
+			if (distances.get(key) == min) {
+				candList.add(key);
+			}
+		}
+
+		return candList;
+	}
+
+	public void joinOldCandidates(ArrayList<Pair> oldcandidates) {
+
+		for (Pair newcluster : oldcandidates) {
+			String left = newcluster.getLeft();
+			String right = newcluster.getRight();
+			if (distances.get(newcluster.getNewName()) != null) {
+
+			} else {
+				if (joinType.equals("single")) {
+					distances
+							.put(newcluster.getNewName(),
+									Math.min(distances.get(left),
+											distances.get(right)));
+					distances.remove(left);
+					distances.remove(right);
+				} else if (joinType.equals("complete")) {
+					distances
+							.put(newcluster.getNewName(),
+									Math.max(distances.get(left),
+											distances.get(right)));
+					distances.remove(left);
+					distances.remove(right);
+				}
+			}
+		}
+
+	}
+
 	public void recalculateRow(ArrayList<Pair> newclusters) {
 		String left, right;
 
@@ -156,4 +212,5 @@ public class DistanceMatrixRow {
 		}
 
 	}
+
 }
