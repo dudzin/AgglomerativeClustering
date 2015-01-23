@@ -86,18 +86,38 @@ public class Cluster {
 
 	public Double getCophenetic(String cl1, String cl2) {
 		String left, right;
-		left = leftParent.getClusterName();
-		right = rightParent.getClusterName();
 
 		if (cl1.equals(cl2)) {
 			return 0.0D;
-		} else if (left.contains(cl1) && left.contains(cl2)) {
-			return leftParent.getCophenetic(cl1, cl2);
-		} else if (right.contains(cl1) && right.contains(cl2)) {
-			return rightParent.getCophenetic(cl1, cl2);
 		} else {
-			return height;
+			if (leftParent != null) {
+				left = leftParent.getClusterName();
+				right = rightParent.getClusterName();
+				// if (left.contains(cl1) && left.contains(cl2)) {
+				if (hasSubCluster(leftParent, cl1)
+						&& hasSubCluster(leftParent, cl2)) {
+					return leftParent.getCophenetic(cl1, cl2);
+					// } else if (right.contains(cl1) && right.contains(cl2)) {
+				} else if (hasSubCluster(rightParent, cl1)
+						&& hasSubCluster(rightParent, cl2)) {
+					return rightParent.getCophenetic(cl1, cl2);
+				} else {
+					return height;
+				}
+			} else {
+				return height;
+			}
 		}
+	}
+
+	public boolean hasSubCluster(Cluster cluster, String cl) {
+		String[] split = cluster.getClusterName().split(",");
+		for (String string : split) {
+			if (string.equals(cl)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

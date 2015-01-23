@@ -211,7 +211,7 @@ public class HierarchicalClusterAlgoritm {
 
 	}
 
-	public void getCophenetic(String fileName) throws FileNotFoundException,
+	public void saveCophenetic(String fileName) throws FileNotFoundException,
 			UnsupportedEncodingException {
 		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 
@@ -226,6 +226,13 @@ public class HierarchicalClusterAlgoritm {
 			writer.println(line);
 		}
 
+		writer.close();
+	}
+
+	public void saveResult(String fileName) throws FileNotFoundException,
+			UnsupportedEncodingException {
+		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+		writer.print(getRoot().getNewickFromRoot());
 		writer.close();
 	}
 

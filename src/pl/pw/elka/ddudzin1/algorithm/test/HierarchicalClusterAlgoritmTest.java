@@ -132,12 +132,12 @@ public class HierarchicalClusterAlgoritmTest {
 				runType);
 		MatrixReader mxr = new MatrixReader();
 		String joinType = "single";
-		DistanceMatrix dm = mxr.read("testdata/10elems", joinType);
+		DistanceMatrix dm = mxr.read("testdata/50elems", joinType);
 
 		alg.setMatrix(dm);
 		alg.run();
 
-		alg.getCophenetic("testResult/result1.txt");
+		alg.saveCophenetic("testResult/result1.txt");
 
 	}
 
