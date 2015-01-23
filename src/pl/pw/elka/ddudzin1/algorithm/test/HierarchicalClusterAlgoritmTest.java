@@ -12,7 +12,10 @@ public class HierarchicalClusterAlgoritmTest {
 
 	@Test
 	public void singlePhaseTest() {
-		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm();
+
+		String runType = "p";
+		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm(
+				runType);
 		MatrixReader mxr = new MatrixReader();
 		String joinType = "single";
 		DistanceMatrix dm = mxr.read("testdata/file1", joinType);
@@ -40,8 +43,9 @@ public class HierarchicalClusterAlgoritmTest {
 
 	@Test
 	public void singleDoublePhaseTest() {
-
-		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm();
+		String runType = "p";
+		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm(
+				runType);
 		MatrixReader mxr = new MatrixReader();
 		String joinType = "single";
 		DistanceMatrix dm = mxr.read("testdata/file2", joinType);
@@ -71,17 +75,47 @@ public class HierarchicalClusterAlgoritmTest {
 
 	@Test
 	public void runTest1() {
-
-		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm();
+		System.out.println("Parallel ");
+		String runType = "p";
+		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm(
+				runType);
 		MatrixReader mxr = new MatrixReader();
 		String joinType = "single";
-		DistanceMatrix dm = mxr.read("testdata/file2", joinType);
+		DistanceMatrix dm = mxr.read("testdata/50elems", joinType);
 
 		alg.setMatrix(dm);
 		alg.run();
 
+		System.out.println("p time: " + alg.getExecutionTime() / 1000 / 1000
+				+ " ms" + " itercnt: " + alg.getIterationCnt());
 		assertEquals(1, alg.getClusters().size());
 		assertEquals(1, alg.getMatrix().getClusterNames().size());
+		assertEquals(8, alg.getIterationCnt());
+
+		// Cluster root = alg.getRoot();
+		// root.print("");
+
+	}
+
+	@Test
+	public void runTest1Linear() {
+		System.out.println("Linear ");
+		String runType = "l";
+		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm(
+				runType);
+		MatrixReader mxr = new MatrixReader();
+		String joinType = "single";
+		DistanceMatrix dm = mxr.read("testdata/50elems", joinType);
+
+		alg.setMatrix(dm);
+		alg.run();
+		System.out.println("l time: " + alg.getExecutionTime() / 1000 / 1000
+				+ " ms" + " itercnt: " + alg.getIterationCnt());
+		assertEquals(1, alg.getClusters().size());
+		assertEquals(1, alg.getMatrix().getClusterNames().size());
+		assertEquals(9, alg.getIterationCnt());
+		// Cluster root = alg.getRoot();
+		// root.print("");
 
 	}
 

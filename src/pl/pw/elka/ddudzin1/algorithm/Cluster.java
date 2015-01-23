@@ -47,4 +47,23 @@ public class Cluster {
 	public void setHeight(Double height) {
 		this.height = height;
 	}
+
+	@Override
+	public String toString() {
+		if (height != null) {
+			return clusterName + ":" + height;
+		}
+		return clusterName ;
+	}
+
+	public void print(String offset) {
+
+		System.out.println(offset + toString());
+		if (leftParent != null) {
+			leftParent.print(offset + "  ");
+		}
+		if (rightParent != null) {
+			rightParent.print(offset + "  ");
+		}
+	}
 }

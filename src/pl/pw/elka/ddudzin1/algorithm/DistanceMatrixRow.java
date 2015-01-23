@@ -127,4 +127,33 @@ public class DistanceMatrixRow {
 
 		return candList;
 	}
+
+	public void recalculateRow(ArrayList<Pair> newclusters) {
+		String left, right;
+
+		for (Pair pair : newclusters) {
+
+			if (distances.get(pair.getNewName()) == null) {
+				left = pair.getLeft();
+				right = pair.getRight();
+				if (joinType.equals("single")) {
+					distances
+							.put(pair.getNewName(),
+									Math.min(distances.get(left),
+											distances.get(right)));
+					distances.remove(left);
+					distances.remove(right);
+				} else if (joinType.equals("complete")) {
+					distances
+							.put(pair.getNewName(),
+									Math.max(distances.get(left),
+											distances.get(right)));
+					distances.remove(left);
+					distances.remove(right);
+				}
+
+			}
+		}
+
+	}
 }

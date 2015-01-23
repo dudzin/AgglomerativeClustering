@@ -12,12 +12,20 @@ public class HierarchicalClusterAlgoritm {
 	private ArrayList<Pair> candidates;
 	HashMap<String, ArrayList<String>> rawcandidates;
 	private HashMap<String, Cluster> clusters;
+	private String runType;
+	private int iterationCnt;
+	private long startTime, endTime;
+
+	public HierarchicalClusterAlgoritm(String runType) {
+		this.runType = runType;
+	}
 
 	public void findCandidates() {
 
 		rawcandidates = new HashMap<String, ArrayList<String>>();
 		Set<String> clusterNames = dm.getClusterNames();
 
+		// split to threads and then join into rawcandidates.putAll
 		for (String clname : clusterNames) {
 			rawcandidates.put(clname, dm.getRow(clname).getCandidates());
 		}
@@ -51,34 +59,27 @@ public class HierarchicalClusterAlgoritm {
 				}
 			}
 		}
+		if (runType.equals("l")) {
+			Double min = -1D, st = -1D, val;
+			Pair minP = new Pair(null, null);
+			for (Pair p : candidates) {
+				val = p.getHeight();
 
-	}
+				if (min.equals(st) && !val.equals(0D)) {
+					min = val;
+					minP = p;
+				} else {
+					if (min > val && !val.equals(0D)) {
+						min = val;
+						minP = p;
+					}
+				}
 
-	public DistanceMatrix getMatrix() {
-		return dm;
-	}
+			}
 
-	public void setMatrix(DistanceMatrix dm) {
-		this.dm = dm;
-
-		clusters = new HashMap<String, Cluster>();
-		Set<String> clusterNames = dm.getClusterNames();
-		Cluster cluster;
-
-		for (String string : clusterNames) {
-			cluster = new Cluster(string, null, null, null);
-			clusters.put(string, cluster);
+			candidates = new ArrayList<Pair>();
+			candidates.add(minP);
 		}
-
-	}
-
-	public HashMap<String, ArrayList<String>> getRawCandidates() {
-
-		return rawcandidates;
-	}
-
-	public ArrayList<Pair> getCandidates() {
-		return candidates;
 	}
 
 	public void join() {
@@ -103,12 +104,76 @@ public class HierarchicalClusterAlgoritm {
 	}
 
 	public void run() {
+		iterationCnt = 0;
+		startTime = System.nanoTime();
+		long intertime1, intertime2 = startTime;
 		while (clusters.size() != 1) {
+
 			findCandidates();
+
+			intertime2 = System.nanoTime();
 			verifyCandidates();
+
+			intertime1 = System.nanoTime();
+			System.out.println("verify " + (intertime1 - intertime2) / 1000
+					/ 1000);
+			intertime2 = System.nanoTime();
 			join();
+
+			intertime1 = System.nanoTime();
+			System.out.println("join " + (intertime1 - intertime2) / 1000
+					/ 1000);
+			iterationCnt++;
+		}
+		endTime = System.nanoTime();
+	}
+
+	public Cluster getRoot() {
+		if (clusters.size() == 1) {
+			Set<String> keys = clusters.keySet();
+			for (String string : keys) {
+				return clusters.get(string);
+			}
+
+		}
+		return null;
+	}
+
+	public DistanceMatrix getMatrix() {
+		return dm;
+	}
+
+	public void setMatrix(DistanceMatrix dm) {
+		this.dm = dm;
+
+		clusters = new HashMap<String, Cluster>();
+		Set<String> clusterNames = dm.getClusterNames();
+		Cluster cluster;
+
+		for (String string : clusterNames) {
+			cluster = new Cluster(string, null, null, null);
+			clusters.put(string, cluster);
 		}
 
 	}
 
+	public int getIterationCnt() {
+		return iterationCnt;
+	}
+
+	public void setIterationCnt(int iterationCnt) {
+		this.iterationCnt = iterationCnt;
+	}
+
+	public HashMap<String, ArrayList<String>> getRawCandidates() {
+		return rawcandidates;
+	}
+
+	public ArrayList<Pair> getCandidates() {
+		return candidates;
+	}
+
+	public long getExecutionTime() {
+		return endTime - startTime;
+	}
 }

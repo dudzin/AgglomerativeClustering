@@ -40,6 +40,7 @@ public class DistanceMatrix {
 
 		Set<String> clusterNames = distanceMatrix.keySet();
 		for (String clname : clusterNames) {
+			System.out.println("	cl: " + clname);
 			if (!newcluster.getNewName().equals(clname))
 				distanceMatrix.get(clname).recalculateRow(newcluster,
 						distanceMatrix.get(newcluster.getNewName()));
@@ -48,10 +49,16 @@ public class DistanceMatrix {
 	}
 
 	public void recalculateMatrix(ArrayList<Pair> newclusters) {
-		for (Pair newcluster : newclusters) {
-			recalculateMatrix(newcluster);
-		}
+		/*
+		 * for (Pair newcluster : newclusters) { System.out.println("newcl" +
+		 * newcluster); recalculateMatrix(newcluster); }
+		 */
 
+		Set<String> clusterNames = distanceMatrix.keySet();
+		for (String clname : clusterNames) {
+			distanceMatrix.get(clname).recalculateRow(newclusters);
+
+		}
 	}
 
 }
