@@ -53,7 +53,7 @@ public class Cluster {
 		if (height != null) {
 			return clusterName + ":" + height;
 		}
-		return clusterName ;
+		return clusterName;
 	}
 
 	public void print(String offset) {
@@ -66,4 +66,38 @@ public class Cluster {
 			rightParent.print(offset + "  ");
 		}
 	}
+
+	public String getNewickFromRoot() {
+		return "(" + getNewick() + ")";
+
+	}
+
+	public String getNewick() {
+		String s = "";
+		if (leftParent != null && rightParent != null) {
+			s = "(" + leftParent.getNewick() + "," + rightParent.getNewick()
+					+ "):" + height;
+		} else {
+			s += clusterName + ":" + 0.0 + "";
+		}
+
+		return s;
+	}
+
+	public Double getCophenetic(String cl1, String cl2) {
+		String left, right;
+		left = leftParent.getClusterName();
+		right = rightParent.getClusterName();
+
+		if (cl1.equals(cl2)) {
+			return 0.0D;
+		} else if (left.contains(cl1) && left.contains(cl2)) {
+			return leftParent.getCophenetic(cl1, cl2);
+		} else if (right.contains(cl1) && right.contains(cl2)) {
+			return rightParent.getCophenetic(cl1, cl2);
+		} else {
+			return height;
+		}
+	}
+
 }

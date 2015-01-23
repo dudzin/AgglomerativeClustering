@@ -1,5 +1,8 @@
 package pl.pw.elka.ddudzin1.algorithm;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -15,6 +18,10 @@ public class HierarchicalClusterAlgoritm {
 	private String runType;
 	private int iterationCnt;
 	private long startTime, endTime;
+	private ArrayList<FindCandidates> fsList;
+	private int threadsCnt = 16;
+	private int sleepTime = 1;
+	private int clusterCnt;
 
 	public HierarchicalClusterAlgoritm(String runType) {
 		this.runType = runType;
@@ -23,12 +30,60 @@ public class HierarchicalClusterAlgoritm {
 	public void findCandidates() {
 
 		rawcandidates = new HashMap<String, ArrayList<String>>();
-		Set<String> clusterNames = dm.getClusterNames();
+		prepareThreads();
+		runThreads();
+		gatherRawCandidates();
+	}
 
-		// split to threads and then join into rawcandidates.putAll
-		for (String clname : clusterNames) {
-			rawcandidates.put(clname,
-					dm.getRow(clname).getCandidates(candidates));
+	public void prepareThreads() {
+
+		fsList = new ArrayList<FindCandidates>();
+
+		for (int i = 0; i < threadsCnt; i++) {
+			FindCandidates fs = new FindCandidates();
+			fs.setCandidates(candidates);
+			fsList.add(fs);
+		}
+
+		Set<String> clnames = dm.getClusterNames();
+		int i = 0;
+		for (String clname : clnames) {
+			if (threadsCnt > 1) {
+				fsList.get(i % (threadsCnt - 1)).addRow(dm.getRow(clname));
+			} else {
+				fsList.get(0).addRow(dm.getRow(clname));
+			}
+		}
+
+	}
+
+	public void runThreads() {
+		ArrayList<Thread> threads = new ArrayList<Thread>();
+		Thread t = new Thread();
+		for (FindCandidates fs : fsList) {
+			t = new Thread(fs);
+			threads.add(t);
+			t.start();
+		}
+		while (areAlive(threads)) {
+
+		}
+	}
+
+	private boolean areAlive(ArrayList<Thread> threads) {
+		for (Thread thread : threads) {
+			if (thread.isAlive()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void gatherRawCandidates() {
+		rawcandidates = new HashMap<String, ArrayList<String>>();
+
+		for (FindCandidates fs : fsList) {
+			rawcandidates.putAll(fs.getRawcandidates());
 		}
 	}
 
@@ -84,9 +139,6 @@ public class HierarchicalClusterAlgoritm {
 	}
 
 	public void join() {
-		long time1, time2;
-		time1 = System.nanoTime();
-		// System.out.println("join " + (intertime1 - intertime2) / 1000);
 		for (Pair pair : candidates) {
 			dm.join(pair);
 			Cluster newclust = new Cluster(pair.getNewName(), clusters.get(pair
@@ -97,11 +149,6 @@ public class HierarchicalClusterAlgoritm {
 			clusters.put(pair.getNewName(), newclust);
 
 		}
-		// time2 = System.nanoTime();
-		// System.out.println("for " + (time2 - time1) / 1000);
-		// dm.recalculateMatrix(candidates);
-		// time1 = System.nanoTime();
-		// System.out.println("recalc " + (time1 - time2) / 1000);
 
 	}
 
@@ -159,8 +206,27 @@ public class HierarchicalClusterAlgoritm {
 		for (String string : clusterNames) {
 			cluster = new Cluster(string, null, null, null);
 			clusters.put(string, cluster);
+			clusterCnt++;
 		}
 
+	}
+
+	public void getCophenetic(String fileName) throws FileNotFoundException,
+			UnsupportedEncodingException {
+		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+
+		String line;
+		for (int i = 0; i < clusterCnt; i++) {
+			line = "" + i + "	";
+			for (int j = 0; j < clusterCnt; j++) {
+				line += getRoot().getCophenetic("" + i, "" + j) + ",";
+			}
+
+			line = line.substring(0, line.length() - 1);
+			writer.println(line);
+		}
+
+		writer.close();
 	}
 
 	public int getIterationCnt() {
@@ -182,4 +248,21 @@ public class HierarchicalClusterAlgoritm {
 	public long getExecutionTime() {
 		return endTime - startTime;
 	}
+
+	public void setThreadsCnt(int threadsCnt) {
+		this.threadsCnt = threadsCnt;
+	}
+
+	public int getThreadsCnt() {
+		return threadsCnt;
+	}
+
+	public int getSleepTime() {
+		return sleepTime;
+	}
+
+	public void setSleepTime(int sleepTime) {
+		this.sleepTime = sleepTime;
+	}
+
 }

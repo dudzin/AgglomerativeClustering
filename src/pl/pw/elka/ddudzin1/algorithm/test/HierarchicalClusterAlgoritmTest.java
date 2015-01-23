@@ -2,6 +2,9 @@ package pl.pw.elka.ddudzin1.algorithm.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+
 import org.junit.Test;
 
 import pl.pw.elka.ddudzin1.algorithm.Cluster;
@@ -82,7 +85,7 @@ public class HierarchicalClusterAlgoritmTest {
 				runType);
 		MatrixReader mxr = new MatrixReader();
 		String joinType = "single";
-		DistanceMatrix dm = mxr.read("testdata/10elems", joinType);
+		DistanceMatrix dm = mxr.read("testdata/50elems", joinType);
 
 		alg.setMatrix(dm);
 		alg.run();
@@ -117,6 +120,24 @@ public class HierarchicalClusterAlgoritmTest {
 		assertEquals(9, alg.getIterationCnt());
 		// Cluster root = alg.getRoot();
 		// root.print("");
+
+	}
+
+	@Test
+	public void copheneticTest() throws FileNotFoundException,
+			UnsupportedEncodingException {
+		System.out.println("copheneticTest ");
+		String runType = "p";
+		HierarchicalClusterAlgoritm alg = new HierarchicalClusterAlgoritm(
+				runType);
+		MatrixReader mxr = new MatrixReader();
+		String joinType = "single";
+		DistanceMatrix dm = mxr.read("testdata/10elems", joinType);
+
+		alg.setMatrix(dm);
+		alg.run();
+
+		alg.getCophenetic("testResult/result1.txt");
 
 	}
 
